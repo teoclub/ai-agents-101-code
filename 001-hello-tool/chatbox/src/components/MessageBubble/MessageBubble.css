@@ -1,0 +1,134 @@
+.message-wrapper {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 20px;
+  animation: messageSlideIn 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+@keyframes messageSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* 用户消息从右侧出现 */
+.message-wrapper.user {
+  flex-direction: row-reverse;
+}
+
+/* 头像 */
+.avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(8px);
+}
+
+.message-wrapper.user .avatar {
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.3), rgba(139, 92, 246, 0.3));
+  border-color: rgba(99, 102, 241, 0.4);
+}
+
+.avatar-icon {
+  font-size: 16px;
+  line-height: 1;
+}
+
+/* 气泡容器 */
+.bubble-container {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-width: 72%;
+}
+
+.message-wrapper.user .bubble-container {
+  align-items: flex-end;
+}
+
+.message-wrapper.assistant .bubble-container {
+  align-items: flex-start;
+}
+
+/* 角色标签 */
+.role-label {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.4);
+  font-weight: 500;
+  padding: 0 4px;
+  letter-spacing: 0.02em;
+}
+
+/* 消息气泡本体 */
+.bubble {
+  padding: 12px 16px;
+  border-radius: 16px;
+  position: relative;
+  word-break: break-word;
+  white-space: pre-wrap;
+  transition: box-shadow 0.2s ease;
+}
+
+.bubble:hover {
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.2);
+}
+
+/* 用户气泡：紫色渐变 */
+.bubble-user {
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  border-radius: 16px 4px 16px 16px;
+  box-shadow: 0 4px 16px rgba(99, 102, 241, 0.3);
+}
+
+/* AI 助手气泡：玻璃拟态 */
+.bubble-assistant {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 4px 16px 16px 16px;
+  backdrop-filter: blur(12px);
+}
+
+/* 消息文字 */
+.bubble-text {
+  margin: 0;
+  font-size: 14.5px;
+  line-height: 1.7;
+  color: rgba(255, 255, 255, 0.92);
+  font-weight: 400;
+}
+
+/* 流式打字光标 */
+.typing-cursor {
+  display: inline-block;
+  width: 2px;
+  height: 1em;
+  background: rgba(255, 255, 255, 0.8);
+  margin-left: 2px;
+  vertical-align: text-bottom;
+  border-radius: 1px;
+  animation: cursorBlink 1s step-end infinite;
+}
+
+@keyframes cursorBlink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+/* 时间戳 */
+.timestamp {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.3);
+  padding: 0 4px;
+  font-variant-numeric: tabular-nums;
+}

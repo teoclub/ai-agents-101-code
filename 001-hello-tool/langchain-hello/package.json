@@ -1,0 +1,22 @@
+{
+  "name": "langchain-hello",
+  "module": "src/index.ts",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "start": "bun run src/index.ts",
+    "hello": "echo 'Hello World!'"
+  },
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  },
+  "dependencies": {
+    "@langchain/anthropic": "^1.3.25",
+    "@langchain/openai": "^1.3.1",
+    "dotenv": "^17.3.1",
+    "zod": "^4.3.6"
+  }
+}
