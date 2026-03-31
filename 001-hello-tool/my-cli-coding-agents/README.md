@@ -1,4 +1,4 @@
-# langchain-hello
+# my-cli-coding-agents
 
 To install dependencies:
 

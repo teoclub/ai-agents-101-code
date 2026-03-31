@@ -1,0 +1,4 @@
+/* index.css —— 基础 Reset，保留最小配置 */
+*, *::before, *::after {
+  box-sizing: border-box;
+}

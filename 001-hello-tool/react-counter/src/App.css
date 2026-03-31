@@ -1,0 +1,83 @@
+/* =========================================
+   全局样式 —— 背景、字体、Reset
+   ========================================= */
+
+/* Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  /* 主色调 */
+  --color-bg-start: #0f0a1e;
+  --color-bg-mid: #1a0f33;
+  --color-bg-end: #0d1a2e;
+
+  /* 过渡 */
+  --transition-base: 0.2s ease;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  background: linear-gradient(
+    135deg,
+    var(--color-bg-start) 0%,
+    var(--color-bg-mid) 50%,
+    var(--color-bg-end) 100%
+  );
+  min-height: 100vh;
+  color: #f0eaff;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+/* 动态网格背景纹理 */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(139, 92, 246, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(139, 92, 246, 0.03) 1px, transparent 1px);
+  background-size: 40px 40px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* 浮动光球装饰 */
+body::after {
+  content: '';
+  position: fixed;
+  width: 500px;
+  height: 500px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(109, 40, 217, 0.12) 0%, transparent 70%);
+  bottom: -100px;
+  right: -100px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ---------- 布局 ---------- */
+.app-layout {
+  position: relative;
+  z-index: 1;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+}
