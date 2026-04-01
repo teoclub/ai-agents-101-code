@@ -1,5 +1,6 @@
 import { ChatOpenAI } from "@langchain/openai";
 import { tool } from "@langchain/core/tools";
+import fs from "node:fs/promises";
 import dotenv from "dotenv";
 import z from "zod";
 import {
@@ -50,11 +51,14 @@ const searchTool = tool(
 // 文件读取工具：让模型先读文件，再根据内容解释代码。
 const readFileTool = tool(
     async ({ filePath }: { filePath: string }): Promise<string> => {
-        const file = Bun.file(filePath, { type: "text/plain;charset=utf-8" });
-        const content = await file.text();
-
-        console.log(`[工具调用] read_file("${filePath}" ==> 成功读取 ${file.size}) 字节`);
-        return `文件内容: \n${content}`;
+        try {
+            const content = await fs.readFile(filePath, 'utf-8');
+            console.log(`  [工具调用] read_file("${filePath}") - 成功读取 ${content.length} 字节`);
+            return `文件内容:\n${content}`;
+        } catch (error: unknown) {
+            console.log(`  [工具调用] read_file("${filePath}") - 错误: ${getErrorMessage(error)}`);
+            return `读取文件失败: ${getErrorMessage(error)}`;
+        }
     },
     {
         name: "read_file",
