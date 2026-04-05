@@ -1,4 +1,4 @@
-import { spawn } from "node:child_process";
+import { spawn, type ChildProcess } from "node:child_process";
 
 type CommandResult = {
     stdout: string;
@@ -8,55 +8,48 @@ type CommandResult = {
 
 export const runCommand = async (
     command: string,
-    workingDirectory: string = process.cwd()
+    workingDirectory?: string
 ): Promise<CommandResult> => {
-    // 优先复用用户当前的 shell，避免和终端里的 PATH / alias / rc 配置不一致。
-    const shell = process.env.SHELL ?? "/bin/zsh";
+    // 没传工作目录时回退到当前进程目录，避免调用方必须显式传 process.cwd()。
+    const cwd = workingDirectory || process.cwd();
+    console.log(`[工具调用] execute_command("${command}")${workingDirectory ? ` - 工作目录: ${workingDirectory}` : ''}`);
 
     return new Promise<CommandResult>((resolve, reject) => {
-        // spawn 可以指定在 cwd 这个目录下执行命令，会创建一个子进程来跑，这也是为啥这个模块叫 child_process
-        // 只显式启动一层 login shell，让整段命令按用户熟悉的 shell 规则解析。
-        // 如果同时再设置 shell: true，Node 会额外包一层 /bin/sh，容易改变引号和分号的语义。
-        const child = spawn(shell, ["-lc", command], {
-            cwd: workingDirectory,
+        // 这里先做一个最轻量的拆分，让 "ls -la" 这类简单命令能直接交给 spawn。
+        const [cmd = '', ...args] = command.split(' ');
+
+        // shell: true 让管道、重定向等 shell 语法可用；ChildProcess 断言是为了兼容当前类型推断。
+        const child = spawn(cmd, args, {
+            cwd,
             env: { ...process.env },
-            // stdin 透传给父进程，stdout / stderr 单独收集，便于上层决定怎么展示结果。
-            stdio: ["inherit", "pipe", "pipe"],
-        });
+            stdio: "inherit", // 实时输出到控制台
+            shell: true,
+        }) as unknown as ChildProcess;
 
-        let stdout = "";
-        let stderr = "";
+        let errMsg = "";
 
-        child.stdout?.setEncoding("utf8");
-        child.stderr?.setEncoding("utf8");
-
-        child.stdout?.on("data", (chunk: string) => {
-            stdout += chunk;
-        });
-
-        child.stderr?.on("data", (chunk: string) => {
-            stderr += chunk;
-        });
-
-        // error 表示子进程连启动都失败了，例如 shell 路径不存在或权限不足。
+        // error 表示子进程本身没能正常启动，不是“命令执行后返回非零退出码”的那种失败。
         child.on("error", (error: Error) => {
-            reject(error);
+            errMsg = error.message;
         });
 
-        // 非零退出码仍然 resolve，让调用方可以结合 stdout / stderr / exitCode 自己决定如何处理失败。
+        // close 一定会在子进程结束后触发，这里统一把退出码整理成工具层需要的结果结构。
         child.on("close", (code: number | null) => {
             if (code === 0) {
                 console.log(`  [工具调用] execute_command("${command}") - 执行成功`);
+                resolve({
+                    stdout: "",
+                    stderr: "",
+                    exitCode: 0,
+                });
             } else {
                 console.log(`  [工具调用] execute_command("${command}") - 执行失败，退出码: ${code}`);
+                resolve({
+                    stdout: "",
+                    stderr: errMsg ? `错误: ${errMsg}` : "",
+                    exitCode: code ?? 1,
+                });
             }
-
-            resolve({
-                stdout,
-                stderr,
-                exitCode: code ?? 1,
-            });
-
         });
     });
 };
@@ -67,6 +60,6 @@ if (import.meta.main) {
 
     // echo 两个 n 是有时候 vite 会让你选择两个选项：安不安装依赖 或 用不用rolldownn; echo n 然后通过管道操作符输出给那个进程就和我们键盘输入 n 一样的效果。
     const command = 'echo -e "n\nn" | bun create vite react-counter-app --template react-ts';
-    const result = await runCommand(command);
+    const result = await runCommand(command, process.cwd());
     console.log(result);
 }
